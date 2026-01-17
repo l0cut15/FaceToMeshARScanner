@@ -111,7 +111,8 @@ class MeshProcessor {
     private func buildAdjacencyList(_ mesh: MDLMesh) -> [Int: Set<Int>] {
         var adjacency = [Int: Set<Int>]()
 
-        guard let submesh = mesh.submeshes.first as? MDLSubmesh else {
+        guard let submeshes = mesh.submeshes,
+              let submesh = submeshes.first as? MDLSubmesh else {
             return adjacency
         }
 
