@@ -31,11 +31,47 @@ struct PreviewView: View {
         NavigationStack {
             ZStack {
                 // 3D Scene View
-                SceneViewContainer(mesh: mesh)
-                    .ignoresSafeArea()
+                if mesh.vertexCount > 0 {
+                    SceneViewContainer(mesh: mesh)
+                        .ignoresSafeArea()
+                } else {
+                    // Show error if mesh is empty
+                    VStack(spacing: 20) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.system(size: 60))
+                            .foregroundColor(.orange)
+                        
+                        Text("No Mesh Data")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        
+                        Text("The captured mesh has no vertices. Please try scanning again.")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(.systemBackground))
+                }
 
                 // Bottom controls
                 VStack {
+                    // Instruction hint at top
+                    if mesh.vertexCount > 0 {
+                        HStack {
+                            Image(systemName: "hand.draw")
+                                .font(.caption)
+                            Text("Drag to rotate • Pinch to zoom")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(8)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(8)
+                        .padding(.top, 60)
+                    }
+                    
                     Spacer()
 
                     // Action buttons
@@ -197,14 +233,24 @@ struct SceneViewContainer: UIViewRepresentable {
     let mesh: MDLMesh
 
     func makeUIView(context: Context) -> SCNView {
+        print("🎨 Creating SCNView for mesh preview...")
+        print("   Mesh vertices: \(mesh.vertexCount)")
+        
         let scnView = SCNView()
         scnView.scene = createScene()
         scnView.allowsCameraControl = true
+        
+        // Use auto lighting as fallback + our custom lights
         scnView.autoenablesDefaultLighting = true
-        scnView.backgroundColor = UIColor.darkGray
-
-        // Set default camera position
-        scnView.pointOfView?.position = SCNVector3(0, 0, 0.5)
+        
+        // Lighter background for better visibility
+        scnView.backgroundColor = UIColor(red: 0.2, green: 0.2, blue: 0.25, alpha: 1.0)
+        
+        // Show statistics for debugging
+        scnView.showsStatistics = true
+        
+        // Anti-aliasing for smoother edges
+        scnView.antialiasingMode = .multisampling4X
 
         return scnView
     }
@@ -215,6 +261,8 @@ struct SceneViewContainer: UIViewRepresentable {
 
     private func createScene() -> SCNScene {
         let scene = SCNScene()
+        
+        print("🎬 Creating scene from mesh...")
 
         // Convert MDLMesh to SCNNode via MDLAsset
         let asset = MDLAsset()
@@ -224,46 +272,94 @@ struct SceneViewContainer: UIViewRepresentable {
 
         // Get the mesh node from converted scene and apply material
         if let meshNode = scnScene.rootNode.childNodes.first {
+            print("✅ Mesh node found!")
+            
+            // Calculate bounding box to position camera properly
+            let (min, max) = meshNode.boundingBox
+            let center = SCNVector3(
+                (min.x + max.x) / 2,
+                (min.y + max.y) / 2,
+                (min.z + max.z) / 2
+            )
+            let size = SCNVector3(
+                max.x - min.x,
+                max.y - min.y,
+                max.z - min.z
+            )
+            
+            print("   Bounding box center: (\(center.x), \(center.y), \(center.z))")
+            print("   Bounding box size: (\(size.x), \(size.y), \(size.z))")
+            
+            // Create simple, visible material
             let material = SCNMaterial()
-            material.diffuse.contents = UIColor.lightGray
-            material.specular.contents = UIColor.white
-            material.shininess = 0.2
-            material.lightingModel = .physicallyBased
+            
+            // Bright diffuse color so it's definitely visible
+            material.diffuse.contents = UIColor(red: 0.85, green: 0.75, blue: 0.65, alpha: 1.0)
+            
+            // Simple Phong lighting (most compatible)
+            material.lightingModel = .phong
+            
+            // Moderate specular for some shine
+            material.specular.contents = UIColor(white: 0.3, alpha: 1.0)
+            material.shininess = 20
+            
+            // Ensure it renders from both sides
+            material.isDoubleSided = true
+            
+            // Make sure it's not transparent
+            material.transparency = 1.0
+            material.transparencyMode = .default
+            
             meshNode.geometry?.materials = [material]
 
-            scene.rootNode.addChildNode(meshNode.clone())
+            scene.rootNode.addChildNode(meshNode)
+            print("✅ Mesh added to scene with visible material")
+        } else {
+            print("❌ No mesh node found in converted scene!")
         }
 
         // Add camera
         let cameraNode = SCNNode()
         cameraNode.camera = SCNCamera()
-        cameraNode.position = SCNVector3(0, 0, 0.5)
+        cameraNode.camera?.fieldOfView = 50
+        cameraNode.camera?.zNear = 0.01
+        cameraNode.camera?.zFar = 100
+        cameraNode.position = SCNVector3(0, 0, 0.4) // Closer to face
         scene.rootNode.addChildNode(cameraNode)
 
-        // Add key light
-        let keyLight = SCNNode()
-        keyLight.light = SCNLight()
-        keyLight.light?.type = .directional
-        keyLight.light?.intensity = 800
-        keyLight.position = SCNVector3(0, 5, 10)
-        keyLight.look(at: SCNVector3(0, 0, 0))
-        scene.rootNode.addChildNode(keyLight)
+        scene.rootNode.addChildNode(cameraNode)
 
-        // Add fill light
-        let fillLight = SCNNode()
-        fillLight.light = SCNLight()
-        fillLight.light?.type = .directional
-        fillLight.light?.intensity = 400
-        fillLight.position = SCNVector3(-5, 0, 5)
-        fillLight.look(at: SCNVector3(0, 0, 0))
-        scene.rootNode.addChildNode(fillLight)
+        // Simplified, brighter lighting setup
+        
+        // Main directional light from front-top
+        let mainLight = SCNNode()
+        mainLight.light = SCNLight()
+        mainLight.light?.type = .directional
+        mainLight.light?.intensity = 2000 // Much brighter
+        mainLight.light?.color = UIColor.white
+        mainLight.light?.castsShadow = false // Disable shadows for now
+        mainLight.position = SCNVector3(0, 2, 2)
+        mainLight.look(at: SCNVector3(0, 0, 0))
+        scene.rootNode.addChildNode(mainLight)
 
-        // Add ambient light
+        // Strong ambient light for overall brightness
         let ambientLight = SCNNode()
         ambientLight.light = SCNLight()
         ambientLight.light?.type = .ambient
-        ambientLight.light?.intensity = 300
+        ambientLight.light?.intensity = 800 // Much brighter
+        ambientLight.light?.color = UIColor.white
         scene.rootNode.addChildNode(ambientLight)
+        
+        // Add omni light near camera for extra illumination
+        let cameraLight = SCNNode()
+        cameraLight.light = SCNLight()
+        cameraLight.light?.type = .omni
+        cameraLight.light?.intensity = 1500
+        cameraLight.light?.color = UIColor.white
+        cameraLight.position = SCNVector3(0, 0, 0.3)
+        scene.rootNode.addChildNode(cameraLight)
+        
+        print("✅ Scene setup complete with bright lighting")
 
         return scene
     }

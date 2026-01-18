@@ -75,7 +75,14 @@ class ARFaceScanner: NSObject, ObservableObject {
             print("❌ No frames captured")
             return nil
         }
-        return aggregateFrames(capturedFrames)
+        print("📦 Creating mesh from \(capturedFrames.count) frames...")
+        let mesh = aggregateFrames(capturedFrames)
+        if let mesh = mesh {
+            print("✅ Mesh created with \(mesh.vertexCount) vertices")
+        } else {
+            print("❌ Failed to create mesh")
+        }
+        return mesh
     }
 
     // MARK: - Private Methods
@@ -116,8 +123,12 @@ class ARFaceScanner: NSObject, ObservableObject {
     private func aggregateFrames(_ frames: [ARFaceGeometry]) -> MDLMesh? {
         guard !frames.isEmpty else { return nil }
 
+        print("🔄 Aggregating \(frames.count) frames...")
+        
         // Simple averaging of vertex positions
         let vertexCount = frames[0].vertices.count
+        print("   Each frame has \(vertexCount) vertices")
+        
         var averagedVertices = [SIMD3<Float>](repeating: SIMD3<Float>(0, 0, 0),
                                                count: vertexCount)
 
@@ -132,7 +143,13 @@ class ARFaceScanner: NSObject, ObservableObject {
         }
 
         // Convert to MDLMesh (triangleIndices are Int16, convert to Int32)
+        let triangleCount = frames[0].triangleCount
+        let indexCount = triangleCount * 3
+        print("   Triangle count: \(triangleCount), Index count: \(indexCount)")
+        
         let int32Indices = frames[0].triangleIndices.map { Int32($0) }
+        print("   Creating MDLMesh with \(averagedVertices.count) vertices and \(int32Indices.count) indices")
+        
         return createMDLMesh(vertices: averagedVertices,
                             indices: int32Indices)
     }
@@ -182,6 +199,18 @@ class ARFaceScanner: NSObject, ObservableObject {
                           vertexCount: vertices.count,
                           descriptor: vertexDescriptor,
                           submeshes: [submesh])
+        
+        // Generate normals for proper shading
+        do {
+            mesh.addNormals(withAttributeNamed: MDLVertexAttributeNormal, creaseThreshold: 0.5)
+            print("✅ MDLMesh created successfully")
+            print("   Vertex count: \(mesh.vertexCount)")
+            print("   Submesh count: \(mesh.submeshes?.count ?? 0)")
+            print("   Normals generated: ✅")
+        } catch {
+            print("⚠️ Could not generate normals: \(error)")
+            print("   Mesh will still display but may look flat")
+        }
 
         return mesh
     }
