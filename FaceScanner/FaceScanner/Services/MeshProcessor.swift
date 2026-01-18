@@ -16,17 +16,22 @@ class MeshProcessor {
         guard iterations > 0 else { return mesh }
 
         // Extract current vertices
-        guard let vertexBuffer = mesh.vertexBuffers.first,
-              let vertexDescriptor = mesh.vertexDescriptor.attributes[0] as? MDLVertexAttribute else {
+        guard let vertexBuffer = mesh.vertexBuffers.first else {
             print("❌ Invalid mesh structure for smoothing")
             return mesh
         }
 
         let vertexCount = mesh.vertexCount
-        let stride = (mesh.vertexDescriptor.layouts[0] as! MDLVertexBufferLayout).stride
+        
+        // Safety check for very large meshes
+        if vertexCount > 50000 {
+            print("⚠️ Large mesh detected (\(vertexCount) vertices). This may take a while...")
+        }
+        
         let vertexPointer = vertexBuffer.map().bytes.assumingMemoryBound(to: SIMD3<Float>.self)
 
         var vertices = [SIMD3<Float>]()
+        vertices.reserveCapacity(vertexCount) // Pre-allocate memory
         for i in 0..<vertexCount {
             vertices.append(vertexPointer[i])
         }
@@ -35,7 +40,11 @@ class MeshProcessor {
         let adjacency = buildAdjacencyList(mesh)
 
         // Laplacian smoothing iterations
-        for _ in 0..<iterations {
+        for iteration in 0..<iterations {
+            if iteration % 5 == 0 {
+                print("🔄 Smoothing iteration \(iteration + 1)/\(iterations)")
+            }
+            
             var smoothedVertices = vertices
 
             for i in 0..<vertexCount {
@@ -55,7 +64,9 @@ class MeshProcessor {
         }
 
         // Create new mesh with smoothed vertices
-        guard let submesh = mesh.submeshes.first as? MDLSubmesh else {
+        guard let submeshes = mesh.submeshes,
+              submeshes.count > 0,
+              let submesh = submeshes[0] as? MDLSubmesh else {
             return mesh
         }
 
@@ -63,6 +74,7 @@ class MeshProcessor {
         let indexCount = submesh.indexCount
         let indexPointer = indexBuffer.map().bytes.assumingMemoryBound(to: UInt32.self)
         var indices = [Int32]()
+        indices.reserveCapacity(indexCount) // Pre-allocate
         for i in 0..<indexCount {
             indices.append(Int32(indexPointer[i]))
         }
@@ -92,7 +104,9 @@ class MeshProcessor {
         }
 
         // Get indices
-        guard let submesh = mesh.submeshes.first as? MDLSubmesh else {
+        guard let submeshes = mesh.submeshes,
+              submeshes.count > 0,
+              let submesh = submeshes[0] as? MDLSubmesh else {
             return mesh
         }
 
@@ -112,7 +126,8 @@ class MeshProcessor {
         var adjacency = [Int: Set<Int>]()
 
         guard let submeshes = mesh.submeshes,
-              let submesh = submeshes.first as? MDLSubmesh else {
+              submeshes.count > 0,
+              let submesh = submeshes[0] as? MDLSubmesh else {
             return adjacency
         }
 

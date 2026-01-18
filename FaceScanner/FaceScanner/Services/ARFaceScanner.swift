@@ -9,6 +9,7 @@ import ARKit
 import Combine
 import ModelIO
 import MetalKit
+import SwiftUI
 
 class ARFaceScanner: NSObject, ObservableObject {
 
@@ -40,18 +41,27 @@ class ARFaceScanner: NSObject, ObservableObject {
     func startScanning() {
         guard ARFaceTrackingConfiguration.isSupported else {
             print("❌ Face tracking not supported on this device")
-            instructionText = "Face tracking not supported"
+            DispatchQueue.main.async {
+                self.instructionText = "Face tracking not supported"
+            }
             return
         }
 
+        print("🎥 Starting AR face tracking session...")
+        
         let configuration = ARFaceTrackingConfiguration()
         configuration.maximumNumberOfTrackedFaces = 1
         configuration.isLightEstimationEnabled = true
 
-        session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+        // Update UI state immediately
         isScanning = true
         capturedFrames.removeAll()
         instructionText = "Position your face in the frame"
+        
+        // Run AR session (this is safe to call from main thread)
+        session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+        
+        print("✅ AR session started successfully")
     }
 
     func stopScanning() {
@@ -121,9 +131,10 @@ class ARFaceScanner: NSObject, ObservableObject {
             averagedVertices[i] /= Float(frames.count)
         }
 
-        // Convert to MDLMesh
+        // Convert to MDLMesh (triangleIndices are Int16, convert to Int32)
+        let int32Indices = frames[0].triangleIndices.map { Int32($0) }
         return createMDLMesh(vertices: averagedVertices,
-                            indices: Array(frames[0].triangleIndices))
+                            indices: int32Indices)
     }
 
     private func createMDLMesh(vertices: [SIMD3<Float>], indices: [Int32]) -> MDLMesh? {
@@ -192,9 +203,16 @@ extension ARFaceScanner: ARSessionDelegate {
             self.faceDetected = true
             self.scanQuality = self.assessScanQuality(faceAnchor, frame: frame)
 
-            // Auto-capture frames when quality is good
+            // Auto-capture frames when quality is good (enforce max limit)
             if self.scanQuality == .good && self.capturedFrames.count < Constants.ScanQuality.maxFrameCount {
                 self.capturedFrames.append(faceAnchor.geometry)
+                // Log every 10th frame to reduce console spam
+                if self.capturedFrames.count % 10 == 0 || self.capturedFrames.count == 1 {
+                    print("📸 Captured frame \(self.capturedFrames.count)/\(Constants.ScanQuality.maxFrameCount)")
+                }
+            } else if self.capturedFrames.count >= Constants.ScanQuality.maxFrameCount {
+                // Stop capturing to prevent unbounded growth
+                self.instructionText = "Ready to capture!"
             }
         }
     }

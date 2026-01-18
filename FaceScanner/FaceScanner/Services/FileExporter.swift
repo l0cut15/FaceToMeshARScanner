@@ -8,7 +8,9 @@
 import Foundation
 import ModelIO
 import SceneKit
+import SceneKit.ModelIO
 import UIKit
+import MetalKit
 
 class FileExporter {
 
@@ -21,7 +23,9 @@ class FileExporter {
         let fileURL = documentsURL.appendingPathComponent("\(filename).\(Constants.Files.stlExtension)")
 
         guard let vertexBuffer = mesh.vertexBuffers.first,
-              let submesh = mesh.submeshes.first as? MDLSubmesh else {
+              let submeshes = mesh.submeshes,
+              submeshes.count > 0,
+              let submesh = submeshes[0] as? MDLSubmesh else {
             print("❌ Invalid mesh structure")
             return nil
         }
@@ -57,34 +61,45 @@ class FileExporter {
 
         // Write triangles
         for i in stride(from: 0, to: indexCount, by: 3) {
+            // Bounds check to prevent crashes
             guard i + 2 < indexCount else {
                 print("⚠️ Skipping invalid triangle at index \(i)")
                 continue
             }
+            
+            let idx0 = Int(indices[i])
+            let idx1 = Int(indices[i + 1])
+            let idx2 = Int(indices[i + 2])
+            
+            // Validate indices are within vertex array bounds
+            guard idx0 < vertices.count && idx1 < vertices.count && idx2 < vertices.count else {
+                print("⚠️ Skipping triangle with out-of-bounds indices: [\(idx0), \(idx1), \(idx2)]")
+                continue
+            }
 
-            let v1 = vertices[Int(indices[i])]
-            let v2 = vertices[Int(indices[i + 1])]
-            let v3 = vertices[Int(indices[i + 2])]
+            let v1 = vertices[idx0]
+            let v2 = vertices[idx1]
+            let v3 = vertices[idx2]
 
             // Calculate normal
             let edge1 = v2 - v1
             let edge2 = v3 - v1
             let normal = normalize(cross(edge1, edge2))
 
-            // Write normal (12 bytes)
-            data.append(withUnsafeBytes(of: normal.x.littleEndian) { Data($0) })
-            data.append(withUnsafeBytes(of: normal.y.littleEndian) { Data($0) })
-            data.append(withUnsafeBytes(of: normal.z.littleEndian) { Data($0) })
+            // Write normal (12 bytes) - use bitPattern for Float to bytes conversion
+            data.append(withUnsafeBytes(of: normal.x.bitPattern.littleEndian) { Data($0) })
+            data.append(withUnsafeBytes(of: normal.y.bitPattern.littleEndian) { Data($0) })
+            data.append(withUnsafeBytes(of: normal.z.bitPattern.littleEndian) { Data($0) })
 
             // Write vertices (36 bytes total)
             for vertex in [v1, v2, v3] {
-                data.append(withUnsafeBytes(of: vertex.x.littleEndian) { Data($0) })
-                data.append(withUnsafeBytes(of: vertex.y.littleEndian) { Data($0) })
-                data.append(withUnsafeBytes(of: vertex.z.littleEndian) { Data($0) })
+                data.append(withUnsafeBytes(of: vertex.x.bitPattern.littleEndian) { Data($0) })
+                data.append(withUnsafeBytes(of: vertex.y.bitPattern.littleEndian) { Data($0) })
+                data.append(withUnsafeBytes(of: vertex.z.bitPattern.littleEndian) { Data($0) })
             }
 
             // Attribute byte count (2 bytes, always 0)
-            var attributeBytes: UInt16 = 0
+            let attributeBytes: UInt16 = 0
             data.append(withUnsafeBytes(of: attributeBytes.littleEndian) { Data($0) })
         }
 
@@ -106,7 +121,9 @@ class FileExporter {
         let fileURL = documentsURL.appendingPathComponent("\(filename).\(Constants.Files.objExtension)")
 
         guard let vertexBuffer = mesh.vertexBuffers.first,
-              let submesh = mesh.submeshes.first as? MDLSubmesh else {
+              let submeshes = mesh.submeshes,
+              submeshes.count > 0,
+              let submesh = submeshes[0] as? MDLSubmesh else {
             print("❌ Invalid mesh structure")
             return nil
         }
@@ -159,14 +176,21 @@ class FileExporter {
         // Create scene
         let scene = SCNScene()
 
-        // Convert MDLMesh to SCNGeometry
-        guard let scnGeometry = try? SCNGeometry(mdlMesh: mesh) else {
-            print("❌ Failed to convert MDLMesh to SCNGeometry")
+        // Convert MDLMesh to SCNGeometry via MDLAsset
+        guard MTLCreateSystemDefaultDevice() != nil else {
+            print("❌ Metal device not available")
             return nil
         }
 
-        let geometryNode = SCNNode(geometry: scnGeometry)
-        scene.rootNode.addChildNode(geometryNode)
+        let asset = MDLAsset()
+        asset.add(mesh)
+
+        let scnScene = SCNScene(mdlAsset: asset)
+
+        // Get the mesh node from converted scene
+        if let meshNode = scnScene.rootNode.childNodes.first {
+            scene.rootNode.addChildNode(meshNode.clone())
+        }
 
         // Position camera
         let cameraNode = SCNNode()

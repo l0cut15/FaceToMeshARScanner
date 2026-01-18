@@ -6,6 +6,21 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		7738B53A2F1BAD0000936942 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7738B5382F1BAD0000936942 /* StorageManager.swift */; };
+		7738B53B2F1BAD0000936942 /* MeshProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7738B5372F1BAD0000936942 /* MeshProcessor.swift */; };
+		7738B53C2F1BAD0000936942 /* FileExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7738B5362F1BAD0000936942 /* FileExporter.swift */; };
+		7738B5412F1BAD0A00936942 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7738B53F2F1BAD0A00936942 /* Extensions.swift */; };
+		7738B5422F1BAD0A00936942 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7738B53E2F1BAD0A00936942 /* Constants.swift */; };
+		777E85532F1CFC15003C5AD5 /* CAMERA_PERMISSIONS_SETUP.md in Resources */ = {isa = PBXBuildFile; fileRef = 777E85522F1CFC15003C5AD5 /* CAMERA_PERMISSIONS_SETUP.md */; };
+		777E85552F1CFD03003C5AD5 /* DEBUGGING_HANG_ISSUE.md in Resources */ = {isa = PBXBuildFile; fileRef = 777E85542F1CFD03003C5AD5 /* DEBUGGING_HANG_ISSUE.md */; };
+		777E85572F1CFFA4003C5AD5 /* SUCCESS_SUMMARY.md in Resources */ = {isa = PBXBuildFile; fileRef = 777E85562F1CFFA4003C5AD5 /* SUCCESS_SUMMARY.md */; };
+		77E963D32F1CEE9D008BFE79 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E963CF2F1CEE9D008BFE79 /* HistoryView.swift */; };
+		77E963D42F1CEE9D008BFE79 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E963CE2F1CEE9D008BFE79 /* EditView.swift */; };
+		77E963D52F1CEE9D008BFE79 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E963D02F1CEE9D008BFE79 /* PreviewView.swift */; };
+		77E963D62F1CEE9D008BFE79 /* ScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77E963D12F1CEE9D008BFE79 /* ScanView.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		7738B4F12F1BA6E500936942 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +42,21 @@
 		7738B4E32F1BA6E400936942 /* FaceScanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FaceScanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7738B4F02F1BA6E500936942 /* FaceScannerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FaceScannerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7738B4FA2F1BA6E500936942 /* FaceScannerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FaceScannerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7738B5302F1BACF400936942 /* FaceScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceScan.swift; sourceTree = "<group>"; };
+		7738B5312F1BACF400936942 /* ScanSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSettings.swift; sourceTree = "<group>"; };
+		7738B5352F1BAD0000936942 /* ARFaceScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARFaceScanner.swift; sourceTree = "<group>"; };
+		7738B5362F1BAD0000936942 /* FileExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileExporter.swift; sourceTree = "<group>"; };
+		7738B5372F1BAD0000936942 /* MeshProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshProcessor.swift; sourceTree = "<group>"; };
+		7738B5382F1BAD0000936942 /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
+		7738B53E2F1BAD0A00936942 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		7738B53F2F1BAD0A00936942 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		777E85522F1CFC15003C5AD5 /* CAMERA_PERMISSIONS_SETUP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CAMERA_PERMISSIONS_SETUP.md; sourceTree = "<group>"; };
+		777E85542F1CFD03003C5AD5 /* DEBUGGING_HANG_ISSUE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DEBUGGING_HANG_ISSUE.md; sourceTree = "<group>"; };
+		777E85562F1CFFA4003C5AD5 /* SUCCESS_SUMMARY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SUCCESS_SUMMARY.md; sourceTree = "<group>"; };
+		77E963CE2F1CEE9D008BFE79 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
+		77E963CF2F1CEE9D008BFE79 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		77E963D02F1CEE9D008BFE79 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
+		77E963D12F1CEE9D008BFE79 /* ScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -34,6 +64,15 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Services/FileExporter.swift,
+				Services/MeshProcessor.swift,
+				Services/StorageManager.swift,
+				Utilities/Constants.swift,
+				Utilities/Extensions.swift,
+				Views/EditView.swift,
+				Views/HistoryView.swift,
+				Views/PreviewView.swift,
+				Views/ScanView.swift,
 			);
 			target = 7738B4E22F1BA6E400936942 /* FaceScanner */;
 		};
@@ -88,10 +127,15 @@
 		7738B4DA2F1BA6E400936942 = {
 			isa = PBXGroup;
 			children = (
+				77E963D22F1CEE9D008BFE79 /* Views */,
 				7738B4E52F1BA6E400936942 /* FaceScanner */,
 				7738B4F32F1BA6E500936942 /* FaceScannerTests */,
 				7738B4FD2F1BA6E500936942 /* FaceScannerUITests */,
 				7738B4E42F1BA6E400936942 /* Products */,
+				7738B5322F1BACF400936942 /* Models */,
+				777E85522F1CFC15003C5AD5 /* CAMERA_PERMISSIONS_SETUP.md */,
+				777E85542F1CFD03003C5AD5 /* DEBUGGING_HANG_ISSUE.md */,
+				777E85562F1CFFA4003C5AD5 /* SUCCESS_SUMMARY.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -103,6 +147,52 @@
 				7738B4FA2F1BA6E500936942 /* FaceScannerUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		7738B5322F1BACF400936942 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				7738B5392F1BAD0000936942 /* Services */,
+				7738B5302F1BACF400936942 /* FaceScan.swift */,
+				7738B5312F1BACF400936942 /* ScanSettings.swift */,
+				7738B5402F1BAD0A00936942 /* Utilities */,
+			);
+			name = Models;
+			path = FaceScanner/Models;
+			sourceTree = "<group>";
+		};
+		7738B5392F1BAD0000936942 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				7738B5352F1BAD0000936942 /* ARFaceScanner.swift */,
+				7738B5362F1BAD0000936942 /* FileExporter.swift */,
+				7738B5372F1BAD0000936942 /* MeshProcessor.swift */,
+				7738B5382F1BAD0000936942 /* StorageManager.swift */,
+			);
+			name = Services;
+			path = FaceScanner/Services;
+			sourceTree = SOURCE_ROOT;
+		};
+		7738B5402F1BAD0A00936942 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				7738B53E2F1BAD0A00936942 /* Constants.swift */,
+				7738B53F2F1BAD0A00936942 /* Extensions.swift */,
+			);
+			name = Utilities;
+			path = FaceScanner/Utilities;
+			sourceTree = SOURCE_ROOT;
+		};
+		77E963D22F1CEE9D008BFE79 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				77E963CE2F1CEE9D008BFE79 /* EditView.swift */,
+				77E963CF2F1CEE9D008BFE79 /* HistoryView.swift */,
+				77E963D02F1CEE9D008BFE79 /* PreviewView.swift */,
+				77E963D12F1CEE9D008BFE79 /* ScanView.swift */,
+			);
+			name = Views;
+			path = FaceScanner/Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -225,6 +315,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				777E85552F1CFD03003C5AD5 /* DEBUGGING_HANG_ISSUE.md in Resources */,
+				777E85532F1CFC15003C5AD5 /* CAMERA_PERMISSIONS_SETUP.md in Resources */,
+				777E85572F1CFFA4003C5AD5 /* SUCCESS_SUMMARY.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,6 +342,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7738B5412F1BAD0A00936942 /* Extensions.swift in Sources */,
+				7738B5422F1BAD0A00936942 /* Constants.swift in Sources */,
+				7738B53A2F1BAD0000936942 /* StorageManager.swift in Sources */,
+				7738B53B2F1BAD0000936942 /* MeshProcessor.swift in Sources */,
+				7738B53C2F1BAD0000936942 /* FileExporter.swift in Sources */,
+				77E963D32F1CEE9D008BFE79 /* HistoryView.swift in Sources */,
+				77E963D42F1CEE9D008BFE79 /* EditView.swift in Sources */,
+				77E963D52F1CEE9D008BFE79 /* PreviewView.swift in Sources */,
+				77E963D62F1CEE9D008BFE79 /* ScanView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -414,6 +516,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FaceScanner/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Scan Face";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -453,6 +556,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FaceScanner/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Scan Face";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
