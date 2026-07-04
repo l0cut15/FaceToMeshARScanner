@@ -151,18 +151,30 @@ struct PreviewView: View {
         }
     }
 
+    /// Applies the current settings to the captured mesh in printer-friendly order:
+    /// smoothing → solidify (at life-size) → scale.
+    private func processMeshForExport() -> MDLMesh {
+        var processedMesh = mesh
+        if settings.smoothingIterations > 0 {
+            processedMesh = meshProcessor.smoothMesh(processedMesh, iterations: settings.smoothingIterations)
+        }
+        if settings.makeSolid {
+            // Thickness is specified in mm at life-size; ARKit meshes are in meters.
+            let thicknessMeters = settings.solidThicknessMM * 0.001
+            processedMesh = meshProcessor.solidify(processedMesh, thickness: thicknessMeters)
+        }
+        if settings.scale != 1.0 {
+            processedMesh = meshProcessor.scaleMesh(processedMesh, scale: settings.scale)
+        }
+        return processedMesh
+    }
+
     private func saveScan() {
         isSaving = true
 
         DispatchQueue.global(qos: .userInitiated).async {
             // Process mesh with current settings
-            var processedMesh = mesh
-            if settings.smoothingIterations > 0 {
-                processedMesh = meshProcessor.smoothMesh(processedMesh, iterations: settings.smoothingIterations)
-            }
-            if settings.scale != 1.0 {
-                processedMesh = meshProcessor.scaleMesh(processedMesh, scale: settings.scale)
-            }
+            let processedMesh = processMeshForExport()
 
             // Export to file
             let scanID = UUID()
@@ -206,11 +218,8 @@ struct PreviewView: View {
         isSaving = true
 
         DispatchQueue.global(qos: .userInitiated).async {
-            // Process and export mesh
-            var processedMesh = mesh
-            if settings.smoothingIterations > 0 {
-                processedMesh = meshProcessor.smoothMesh(processedMesh, iterations: settings.smoothingIterations)
-            }
+            // Process and export mesh with the same settings used when saving.
+            let processedMesh = processMeshForExport()
 
             let filename = "FaceScan_\(Date().ISO8601Format())"
             let url = fileExporter.exportAsSTL(processedMesh, filename: filename)

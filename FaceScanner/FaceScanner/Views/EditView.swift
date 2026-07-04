@@ -68,6 +68,42 @@ struct EditView: View {
                         .foregroundColor(.secondary)
                 }
 
+                // 3D Printing Section
+                Section("3D Printing") {
+                    Toggle("Make solid (manifold)", isOn: $settings.makeSolid)
+
+                    if settings.makeSolid {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Wall thickness")
+                                Spacer()
+                                Text(String(format: "%.1f mm", settings.solidThicknessMM))
+                                    .foregroundColor(.secondary)
+                            }
+
+                            Slider(
+                                value: $settings.solidThicknessMM,
+                                in: Constants.Mesh.minSolidThicknessMM...Constants.Mesh.maxSolidThicknessMM,
+                                step: 0.5
+                            )
+
+                            HStack {
+                                Text(String(format: "%.0f mm", Constants.Mesh.minSolidThicknessMM))
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text(String(format: "%.0f mm", Constants.Mesh.maxSolidThicknessMM))
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+
+                    Text("Extrudes the open face scan into a watertight solid so it can be sliced and 3D printed. Thickness is measured at life-size.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
                 // Scale Section
                 Section("Scale") {
                     VStack(alignment: .leading, spacing: 8) {
@@ -132,6 +168,8 @@ struct EditView: View {
         settings.quality = .medium
         settings.scale = Constants.Mesh.defaultScale
         settings.smoothingIterations = Constants.Mesh.defaultSmoothingIterations
+        settings.makeSolid = false
+        settings.solidThicknessMM = Constants.Mesh.defaultSolidThicknessMM
     }
 }
 

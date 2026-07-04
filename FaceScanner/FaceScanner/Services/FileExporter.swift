@@ -30,12 +30,13 @@ class FileExporter {
             return nil
         }
 
-        // Extract vertices
+        // Extract vertices, converting meters → millimeters so the model prints life-size.
+        let unitScale = Constants.Files.metersToMillimeters
         let vertexCount = mesh.vertexCount
         let vertexPointer = vertexBuffer.map().bytes.assumingMemoryBound(to: SIMD3<Float>.self)
         var vertices = [SIMD3<Float>]()
         for i in 0..<vertexCount {
-            vertices.append(vertexPointer[i])
+            vertices.append(vertexPointer[i] * unitScale)
         }
 
         // Extract indices
@@ -128,7 +129,8 @@ class FileExporter {
             return nil
         }
 
-        // Extract vertices
+        // Extract vertices (converted meters → millimeters so the model prints life-size)
+        let unitScale = Constants.Files.metersToMillimeters
         let vertexCount = mesh.vertexCount
         let vertexPointer = vertexBuffer.map().bytes.assumingMemoryBound(to: SIMD3<Float>.self)
 
@@ -146,7 +148,7 @@ class FileExporter {
 
         // Write vertices
         for i in 0..<vertexCount {
-            let v = vertexPointer[i]
+            let v = vertexPointer[i] * unitScale
             objContent += "v \(v.x) \(v.y) \(v.z)\n"
         }
 

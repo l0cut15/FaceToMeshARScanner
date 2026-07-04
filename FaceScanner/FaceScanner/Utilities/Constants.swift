@@ -21,6 +21,9 @@ enum Constants {
     // MARK: - File Management
     enum Files {
         static let scansDirectoryName = "scans"
+        /// ARKit meshes are in meters; STL/OBJ are conventionally millimeters. Multiply
+        /// exported coordinates by this so a 1.0× scan prints life-size.
+        static let metersToMillimeters: Float = 1000.0
         static let stlExtension = "stl"
         static let objExtension = "obj"
         static let thumbnailSize = CGSize(width: 512, height: 512)
@@ -40,7 +43,12 @@ enum Constants {
         static let defaultScale: Float = 1.0
         static let minScale: Float = 0.5
         static let maxScale: Float = 2.0
-        static let defaultSmoothingIterations = 2
-        static let maxSmoothingIterations = 10
+        static let defaultSmoothingIterations = 8
+        static let maxSmoothingIterations = 30
+
+        // Solidify (manifold shell) — thickness expressed in millimeters at life-size.
+        static let defaultSolidThicknessMM: Float = 3.0
+        static let minSolidThicknessMM: Float = 1.0
+        static let maxSolidThicknessMM: Float = 8.0
     }
 }
